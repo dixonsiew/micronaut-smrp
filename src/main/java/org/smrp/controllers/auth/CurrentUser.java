@@ -31,7 +31,7 @@ import reactor.core.publisher.Mono;
 
 @Tag(name = "Auth")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@SecurityRequirement(name="BearerAuth")
+@SecurityRequirement(name = "BearerAuth")
 @Controller("/api")
 @Validated
 public class CurrentUser {

@@ -42,7 +42,7 @@ import jakarta.validation.Valid;
 
 @Tag(name = "Setup/User")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@SecurityRequirement(name="BearerAuth")
+@SecurityRequirement(name = "BearerAuth")
 @Controller("/api")
 @Validated
 public class UserController {
