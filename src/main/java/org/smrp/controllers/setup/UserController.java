@@ -32,7 +32,7 @@ import io.micronaut.validation.validator.Validator;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.ConstraintViolation;
@@ -42,6 +42,7 @@ import jakarta.validation.Valid;
 
 @Tag(name = "Setup/User")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@SecurityRequirement(name="BearerAuth")
 @Controller("/api")
 @Validated
 public class UserController {

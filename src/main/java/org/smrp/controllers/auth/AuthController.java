@@ -37,8 +37,8 @@ import reactor.core.publisher.Mono;
 
 @Tag(name = "Auth")
 @Secured(SecurityRule.IS_ANONYMOUS)
-@Controller("/o")
 @SecurityRequirement(name="")
+@Controller("/o")
 @Validated
 public class AuthController {
     

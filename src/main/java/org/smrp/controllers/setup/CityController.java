@@ -41,8 +41,8 @@ import reactor.core.publisher.Flux;
 
 @Tag(name = "Setup/City")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@Controller("/api")
 @SecurityRequirement(name="BearerAuth")
+@Controller("/api")
 @Validated
 public class CityController {
     
