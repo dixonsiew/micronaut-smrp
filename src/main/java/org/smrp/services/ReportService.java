@@ -2,6 +2,7 @@ package org.smrp.services;
 
 import org.bson.Document;
 import org.smrp.Constants;
+import org.smrp.models.CommonSetup;
 
 import jakarta.inject.Singleton;
 import reactor.core.publisher.Mono;
@@ -121,24 +122,23 @@ public class ReportService {
     }
 
     public Mono<String> getCode(String key, Document doc, String table) {
-        String x = Constants.NO_INFO;
+        final String x = Constants.NO_INFO;
         String s = get(key, doc);
-        if (!"".equals(s)) {
-            return commonSetupService.findByDesc(s, table)
-                .flatMap(o -> {
-                    if (o != null) {
-                        return Mono.just(o.getCode());
-                    }
-                    return Mono.just(x);
-                })
-                .switchIfEmpty(Mono.just(x));
+        if ("".equals(s)) {
+            return Mono.just(x);
         }
-
-        return Mono.just(x);
+        return commonSetupService.findByDesc(s, table)
+            .map(CommonSetup::getCode)
+            .map(c -> (c == null || c.trim().isEmpty()) ? x : c)
+            .defaultIfEmpty(x)
+            .onErrorResume(e -> Mono.just(x));
     }
 
     public String get(String key, Document doc) {
         String s = "";
+        if (doc == null) {
+            return s;
+        }
         Object v = doc.get(key);
         if (v != null) {
             s = String.valueOf(v);
