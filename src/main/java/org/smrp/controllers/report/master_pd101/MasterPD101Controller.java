@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.reactivestreams.client.MongoClient;
@@ -32,7 +31,6 @@ import io.micronaut.context.annotation.Value;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -56,7 +54,6 @@ public class MasterPD101Controller extends Master {
     private final MongoClient mongoClient;
     private final String mongodbPrefix;
     private final String facilityCode;
-    private final ReportService reportService;
 
     public MasterPD101Controller(
         MongoClient mongoClient,
@@ -68,14 +65,13 @@ public class MasterPD101Controller extends Master {
         this.mongoClient = mongoClient;
         this.mongodbPrefix = mongodbPrefix;
         this.facilityCode = facilityCode;
-        this.reportService = reportService;
     }
 
     @Get("/export/rpt1")
     @Produces(MediaType.APPLICATION_JSON)
     public Mono<HttpResponse<?>> jsonpd101(
-        @QueryValue(value = "datefrom", defaultValue = "") String datefrom,
-        @QueryValue(value = "dateto", defaultValue = "") String dateto,
+        @QueryValue(value = "datefrom", defaultValue = "2023-01-01") String datefrom,
+        @QueryValue(value = "dateto", defaultValue = "2024-01-01") String dateto,
         Authentication authentication
     ) {
         String username = authentication.getName();
@@ -319,8 +315,8 @@ public class MasterPD101Controller extends Master {
     @ExecuteOn(TaskExecutors.IO)
     public Mono<HttpResponse<?>> xlsx(
         @QueryValue(value = "vt", defaultValue = "0") String vt,
-        @QueryValue(value = "datefrom", defaultValue = "") String datefrom,
-        @QueryValue(value = "dateto", defaultValue = "") String dateto,
+        @QueryValue(value = "datefrom", defaultValue = "2023-01-01") String datefrom,
+        @QueryValue(value = "dateto", defaultValue = "2024-01-01") String dateto,
         Authentication authentication
     ) {
         String username = authentication.getName();
