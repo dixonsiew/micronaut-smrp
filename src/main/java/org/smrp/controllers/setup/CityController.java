@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.smrp.Constants;
 import org.smrp.dtos.CommonSetupDto;
+import org.smrp.dtos.KeywordDto;
 import org.smrp.models.CommonSetup;
 import org.smrp.models.Pager;
 import org.smrp.services.CommonSetupService;
@@ -86,8 +87,40 @@ public class CityController {
 
         return commonSetupService.count(table).map(total -> {
             Pager pg = Pager.from(total, page, limit);
-            Flux<CommonSetup> data = commonSetupService.findAll(table, pg.getLowerBound(), pg.getPageSize(), fsortBy, fsortDir);
-            return HttpResponse.ok(data)
+            Flux<CommonSetup> items = commonSetupService.findAll(table, pg.getLowerBound(), pg.getPageSize(), fsortBy, fsortDir);
+            return HttpResponse.ok(items)
+                .header(Constants.X_TOTAL_COUNT, String.valueOf(total))
+                .header(Constants.X_TOTAL_PAGE, String.valueOf(pg.getTotalPages()));
+        });
+    }
+
+    @Post("/cities")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Mono<HttpResponse<?>> searchList(
+        @Valid @Body KeywordDto data,
+        @QueryValue(value = "_page", defaultValue = "1") Integer page,
+        @QueryValue(value = "_limit", defaultValue = "10") Integer limit,
+        @Nullable @QueryValue(value = "sort", defaultValue = "") String sorts
+    ) {
+        String sortBy = "code";
+        String sortDir = "asc";
+
+        if (sorts != null && !sorts.isEmpty()) {
+            String[] lis = sorts.split("\\$");
+            String s = lis[0];
+            String[] arr = s.split(":");
+            sortBy = arr[0];
+            sortDir = arr[1];
+        }
+
+        final String key = String.format("%%%s%%", data.getKeyword());
+        final String fsortBy = sortBy;
+        final String fsortDir = sortDir;
+
+        return commonSetupService.countByKeyword(key, table).map(total -> {
+            Pager pg = Pager.from(total, page, limit);
+            Flux<CommonSetup> items = commonSetupService.findByKeyword(key, pg.getLowerBound(), pg.getPageSize(), fsortBy, fsortDir, table);
+            return HttpResponse.ok(items)
                 .header(Constants.X_TOTAL_COUNT, String.valueOf(total))
                 .header(Constants.X_TOTAL_PAGE, String.valueOf(pg.getTotalPages()));
         });

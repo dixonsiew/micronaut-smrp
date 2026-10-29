@@ -67,6 +67,120 @@ public class MasterPD101Controller extends Master {
         this.facilityCode = facilityCode;
     }
 
+    @Get("/export/rpt2")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Mono<HttpResponse<?>> jsonrh101(
+        @QueryValue(value = "datefrom", defaultValue = "2023-01-01") String datefrom,
+        @QueryValue(value = "dateto", defaultValue = "2024-01-01") String dateto,
+        Authentication authentication
+    ) {
+        String username = authentication.getName();
+        MongoCollection<Document> col = getCollection(username, "1");
+
+        String[] dt1 = datefrom.split("-");
+        String[] dt2 = dateto.split("-");
+        String ds1 = String.format("%s%s%s", dt1[2], dt1[1], dt1[0]);
+        String ds2 = String.format("%s%s%s", dt2[2], dt2[1], dt2[0]);
+        String filename = String.format("%s_%s_%s_RH101.json", facilityCode, ds1, ds2);
+
+        return Flux.from(col.find())
+            .collectList()
+            .flatMap(ls -> {
+                if (ls.isEmpty()) {
+                    Map<String, Object> data = new LinkedHashMap<>();
+                    data.put("filename", filename);
+                    data.put("admissionFrom", datefrom);
+                    data.put("admissionTo", dateto);
+                    data.put("refServiceTypeCode", "02");
+                    data.put("facilityCode", facilityCode);
+                    data.put("forms", List.of());
+                    return Mono.just(send(data, filename));
+                }
+
+                List<Document> lr = Utils.processDoc(ls);
+                List<Mono<Map<String, String>>> monos = lr.stream()
+                        .map(this::getData)
+                        .collect(Collectors.toList());
+
+                return Mono.zip(monos, objects -> {
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, String>> lm = (List<Map<String, String>>) (List<?>) Arrays.asList(objects);
+                    List<Map<String, Object>> forms = new ArrayList<>();
+                    for (int i = 0; i < lr.size(); i++) {
+                        Document doc = lr.get(i);
+                        Map<String, String> md = lm.get(i);
+                        Map<String, Object> person = new LinkedHashMap<>();
+                        person.put("refPersonTitleCode", md.get("refPersonTitleCode"));
+                        person.put("fullName", Utils.getStr(doc.get("PATIENT_NAME")));
+                        person.put("refIdentificationTypeCode", md.get("refIdentificationTypeCode"));
+                        person.put("identificationNo", Utils.getStr(doc.get("DOCUMENT_NUMBER")));
+                        person.put("refAddressTypeCode", "C");
+                        person.put("street1", Utils.getStr(doc.get("STREET1")));
+                        person.put("street2", Utils.getStr(doc.get("STREET2")));
+                        person.put("refCityCode", md.get("refCityCode"));
+                        person.put("refPostCode", Utils.getStr(doc.get("POSTCODE")));
+                        person.put("refStateCode", md.get("refStateCode"));
+                        person.put("refCountryCode", md.get("refCitizenshipCode"));
+                        person.put("refContactTypeCode", "02");
+                        person.put("contactInfo", Utils.getStr(doc.get("HOME_PHONE")));
+
+                        Map<String, Object> nok = new LinkedHashMap<>();
+                        nok.put("refPersonTitleCode", md.get("refPersonTitleCode"));
+                        nok.put("fullName", Utils.getStr(doc.get("PATIENT_NOK_NAME")));
+                        nok.put("refIdentificationTypeCode", md.get("refIdentificationTypeCodeNOK"));
+                        nok.put("identificationNo", Utils.getStr(doc.get("NOK_ID")));
+                        nok.put("refAddressTypeCode", "C");
+                        nok.put("street1", Utils.getStr(doc.get("NOK_STREET1")));
+                        nok.put("street2", Utils.getStr(doc.get("NOK_STREET2")));
+                        nok.put("refCityCode", md.get("refCityCodeNOK"));
+                        nok.put("refPostCode", Utils.getStr(doc.get("NOK_POSTCODE")));
+                        nok.put("refStateCode", md.get("refStateCodeNOK"));
+                        nok.put("refCountryCode", md.get("refCitizenshipCodeNOK"));
+                        nok.put("refContactTypeCode", "02");
+                        nok.put("contactInfo", Utils.getStr(doc.get("NOK_MOBILE_PHONE")));
+
+                        Map<String, Object> m = new LinkedHashMap<>();
+                        m.put("rn", Utils.getStr(doc.get("ACCOUNT_NO")));
+                        m.put("mrn", Utils.getStr(doc.get("PRN")));
+                        m.put("eventDate", String.format("%s %s:00",
+                                doc.get("REGISTRATION_DATE"),
+                                doc.get("REGISTRATION_TIME")));
+                        m.put("isPoliceCase", "00");
+                        m.put("internalReferral", "false");
+                        m.put("refReferralSourceCode", md.get("refReferralSourceCode"));
+                        m.put("refGenderCode", md.get("refGenderCode"));
+                        m.put("dob", Utils.getStr(doc.get("DOB")));
+                        m.put("refMaritalStatusCode", md.get("refMaritalStatusCode"));
+                        m.put("refReligionCode", md.get("refReligionCode"));
+                        m.put("refCitizenshipCode", md.get("refCitizenshipCode"));
+                        m.put("refEthnicCode", md.get("refEthnicCode"));
+                        m.put("height", Utils.getNum(Utils.getStr(doc.get("HEIGHT"))));
+                        m.put("weight", Utils.getNum(Utils.getStr(doc.get("WEIGHT"))));
+                        m.put("refForeignerOriginCountryCode", md.get("refForeignerOriginCountryCode"));
+                        m.put("refForeignerResidenceCountryCode", md.get("refForeignerResidenceCountryCode"));
+                        m.put("refPersonCategoryCode", md.get("refPersonCategoryCode"));
+                        m.put("refRelationshipCode", md.get("refRelationshipCode"));
+                        m.put("totalDurationDay", "0");
+                        m.put("admissionDate", String.format("%s %s:00",
+                                doc.get("ADMISSION_DATE"),
+                                doc.get("ADMISSION_TIME")));
+                        m.put("person", person);
+                        m.put("nextOfKins", nok);
+
+                        forms.add(m);
+                    }
+                    Map<String, Object> data = new LinkedHashMap<>();
+                    data.put("filename", filename);
+                    data.put("admissionFrom", datefrom);
+                    data.put("admissionTo", dateto);
+                    data.put("refServiceTypeCode", "02");
+                    data.put("facilityCode", facilityCode);
+                    data.put("forms", forms);
+                    return send(data, filename);
+                });
+            });
+    }
+
     @Get("/export/rpt1")
     @Produces(MediaType.APPLICATION_JSON)
     public Mono<HttpResponse<?>> jsonpd101(
@@ -84,7 +198,7 @@ public class MasterPD101Controller extends Master {
         String filename = String.format("%s_%s_%s_PD101.json", facilityCode, ds1, ds2);
 
         return Flux.from(col.find())
-            .collectList()                              // Mono<List<Document>>
+            .collectList()
             .flatMap(ls -> {
                 if (ls.isEmpty()) {
                     Map<String, Object> data = new LinkedHashMap<>();
@@ -94,14 +208,7 @@ public class MasterPD101Controller extends Master {
                     data.put("refServiceTypeCode", "01");
                     data.put("facilityCode", facilityCode);
                     data.put("forms", List.of());
-                    return Mono.just(HttpResponse.ok(data)
-                        .header("Content-Disposition", "attachment; filename=" + filename)
-                        .header("Cache-Control", "no-cache, no-store, must-revalidate")
-                        .header("Pragma", "no-cache")
-                        .header("Expires", "0")
-                        .header("filename", filename)
-                        .header("Content-Type", MediaType.APPLICATION_JSON)
-                    );
+                    return Mono.just(send(data, filename));
                 }
 
                 List<Document> lr = Utils.processDoc(ls);
@@ -190,13 +297,7 @@ public class MasterPD101Controller extends Master {
                     data.put("refServiceTypeCode", "01");
                     data.put("facilityCode", facilityCode);
                     data.put("forms", forms);
-                    return HttpResponse.ok(data)
-                        .header("Content-Disposition", "attachment; filename=" + filename)
-                        .header("Cache-Control", "no-cache, no-store, must-revalidate")
-                        .header("Pragma", "no-cache")
-                        .header("Expires", "0")
-                        .header("filename", filename)
-                        .header("Content-Type", MediaType.APPLICATION_JSON);
+                    return send(data, filename);
                 });
             });
     }
@@ -335,13 +436,7 @@ public class MasterPD101Controller extends Master {
                 try {
                     List<Document> lr = Utils.processDoc(ls);
                     byte[] bx = Utils.getXlsx(ColMap.COLUMN_MAP, lr);
-                    return Mono.just(HttpResponse.ok(bx)
-                        .header("Content-Disposition", "attachment; filename=" + filename)
-                        .header("Cache-Control", "no-cache, no-store, must-revalidate")
-                        .header("Pragma", "no-cache")
-                        .header("Expires", "0")
-                        .header("filename", filename)
-                        .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+                    return Mono.just(send(bx, filename));
                 } catch (Exception e) {
                     return Mono.error(new RuntimeException(e));
                 }

@@ -2,10 +2,11 @@ package org.smrp.services;
 
 import org.smrp.models.CommonSetup;
 
-import io.micronaut.data.connection.reactive.ReactorConnectionOperations;
-import io.micronaut.transaction.reactive.ReactorReactiveTransactionOperations;
-import io.r2dbc.spi.Connection;
+import io.micronaut.data.r2dbc.connection.DefaultR2dbcReactorConnectionOperations;
+import io.micronaut.data.r2dbc.transaction.R2dbcReactorTransactionOperations;
+
 import jakarta.inject.Singleton;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -13,10 +14,10 @@ import reactor.core.publisher.Mono;
 @Singleton 
 public class CommonSetupService {
     
-    private final ReactorConnectionOperations<Connection> conn;
-    private final ReactorReactiveTransactionOperations<Connection> tx;
+    private final DefaultR2dbcReactorConnectionOperations conn;
+    private final R2dbcReactorTransactionOperations tx;
 
-    public CommonSetupService(ReactorConnectionOperations<Connection> conn, ReactorReactiveTransactionOperations<Connection> tx) {
+    public CommonSetupService(DefaultR2dbcReactorConnectionOperations conn, R2dbcReactorTransactionOperations tx) {
         this.conn = conn;
         this.tx = tx;
     }
@@ -26,11 +27,11 @@ public class CommonSetupService {
         final String s = String.format(q, table);
         return conn.withConnectionMono(status ->
             Mono.from(status.getConnection().createStatement(s)
-                .bind(0, id)
-                .execute())
-            .flatMap(result ->
-                Mono.from(result.map((row, metadata) -> CommonSetup.fromRow(row)))
-            )
+                    .bind(0, id)
+                    .execute())
+                .flatMap(result ->
+                    Mono.from(result.map((row, metadata) -> CommonSetup.fromRow(row)))
+                )
         );
     }
 
@@ -52,11 +53,11 @@ public class CommonSetupService {
         // );
         return conn.withConnectionMono(status ->
             Mono.from(status.getConnection().createStatement(s)
-                .bind(0, desc)
-                .execute())
-            .flatMap(result ->
-                Mono.from(result.map((row, metadata) -> CommonSetup.fromRow(row)))
-            )
+                    .bind(0, desc)
+                    .execute())
+                .flatMap(result ->
+                    Mono.from(result.map((row, metadata) -> CommonSetup.fromRow(row)))
+                )
         );
     }
 
@@ -66,22 +67,22 @@ public class CommonSetupService {
             final String s = String.format(q, table, sortBy, sortDir);
             return conn.withConnectionFlux(status ->
                 Flux.from(status.getConnection().createStatement(s)
-                    .bind(0, offset)
-                    .bind(1, limit)
-                    .execute())
-                .flatMap(result ->
-                    result.map((row, metadata) -> CommonSetup.fromRow(row))
-                )
+                        .bind(0, offset)
+                        .bind(1, limit)
+                        .execute())
+                    .flatMap(result ->
+                        result.map((row, metadata) -> CommonSetup.fromRow(row))
+                    )
             );
         } else {
             String q = "select t.id, t.code, t.desc, t.ref, t.created_by, t.created_date, t.modified_by, t.modified_date, t.deleted, t.deleted_by, t.deleted_date from %s t where t.desc <> '' and t.deleted is not true order by t.code";
             final String s = String.format(q, table);
             return conn.withConnectionFlux(status ->
                 Flux.from(status.getConnection().createStatement(s)
-                    .execute())
-                .flatMap(result ->
-                    result.map((row, metadata) -> CommonSetup.fromRow(row))
-                )
+                        .execute())
+                    .flatMap(result ->
+                        result.map((row, metadata) -> CommonSetup.fromRow(row))
+                    )
             );
         }
     }
@@ -91,10 +92,10 @@ public class CommonSetupService {
         final String s = String.format(q, table);
         return conn.withConnectionMono(status ->
             Mono.from(status.getConnection().createStatement(s)
-                .execute())
-            .flatMap(result ->
-                Mono.from(result.map((row, metadata) -> row.get(0, Long.class)))
-            )
+                    .execute())
+                .flatMap(result ->
+                    Mono.from(result.map((row, metadata) -> row.get(0, Long.class)))
+                )
         );
     }
 
@@ -103,15 +104,15 @@ public class CommonSetupService {
         final String s = String.format(q, table, sortBy, sortDir);
         return conn.withConnectionFlux(status ->
             Flux.from(status.getConnection().createStatement(s)
-                .bind(0, keyword)
-                .bind(1, keyword)
-                .bind(2, keyword)
-                .bind(3, offset)
-                .bind(4, limit)
-                .execute())
-            .flatMap(result ->
-                result.map((row, metadata) -> CommonSetup.fromRow(row))
-            )
+                    .bind(0, keyword)
+                    .bind(1, keyword)
+                    .bind(2, keyword)
+                    .bind(3, offset)
+                    .bind(4, limit)
+                    .execute())
+                .flatMap(result ->
+                    result.map((row, metadata) -> CommonSetup.fromRow(row))
+                )
         );
     }
 
@@ -120,13 +121,13 @@ public class CommonSetupService {
         final String s = String.format(q, table);
         return conn.withConnectionMono(status ->
             Mono.from(status.getConnection().createStatement(s)
-                .bind(0, keyword)
-                .bind(1, keyword)
-                .bind(2, keyword)
-                .execute())
-            .flatMap(result ->
-                Mono.from(result.map((row, metadata) -> row.get(0, Long.class)))
-            )
+                    .bind(0, keyword)
+                    .bind(1, keyword)
+                    .bind(2, keyword)
+                    .execute())
+                .flatMap(result ->
+                    Mono.from(result.map((row, metadata) -> row.get(0, Long.class)))
+                )
         );
     }
 
@@ -135,11 +136,11 @@ public class CommonSetupService {
         final String s = String.format(q, table, table);
         return tx.withTransactionMono(status ->
             Mono.from(status.getConnection().createStatement(s)
-                .bind(0, o.getCode())
-                .bind(1, o.getDesc())
-                .bind(2, o.getRef())
-                .bind(3, o.getCreatedBy())
-                .execute())
+                    .bind(0, o.getCode())
+                    .bind(1, o.getDesc())
+                    .bind(2, o.getRef())
+                    .bind(3, o.getCreatedBy())
+                    .execute())
                 .flatMap(result -> Mono.from(result.getRowsUpdated()))
                 .then()
         );
@@ -150,12 +151,12 @@ public class CommonSetupService {
         final String s = String.format(q, table);
         return tx.withTransactionMono(status ->
             Mono.from(status.getConnection().createStatement(s)
-                .bind(0, o.getCode())
-                .bind(1, o.getDesc())
-                .bind(2, o.getRef())
-                .bind(3, o.getModifiedBy())
-                .bind(4, o.getId())
-                .execute())
+                    .bind(0, o.getCode())
+                    .bind(1, o.getDesc())
+                    .bind(2, o.getRef())
+                    .bind(3, o.getModifiedBy())
+                    .bind(4, o.getId())
+                    .execute())
                 .flatMap(result -> Mono.from(result.getRowsUpdated()))
                 .then()
         );
@@ -166,9 +167,9 @@ public class CommonSetupService {
         final String s = String.format(q, table);
         return tx.withTransactionMono(status ->
             Mono.from(status.getConnection().createStatement(s)
-                .bind(0, userId)
-                .bind(1, id)
-                .execute())
+                    .bind(0, userId)
+                    .bind(1, id)
+                    .execute())
                 .flatMap(result -> Mono.from(result.getRowsUpdated()))
                 .then()
         );

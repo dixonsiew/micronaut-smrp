@@ -181,14 +181,10 @@ public class Utils {
 
         finally {
             try {
-                if (wb != null) {
-                    wb.close();
-                }
-                if (bx != null) {
-                    bx.close();
-                }
+                wb.close();
+                bx.close();
             } catch (Exception e) {
-                
+
             }
         }
     }

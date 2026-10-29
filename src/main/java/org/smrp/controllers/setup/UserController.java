@@ -80,8 +80,8 @@ public class UserController {
 
         return userService.count().map(total -> {
             Pager pg = Pager.from(total, page, limit);
-            Flux<User> data = userService.findAll(pg.getLowerBound(), pg.getPageSize(), fsortBy, fsortDir);
-            return HttpResponse.ok(data)
+            Flux<User> items = userService.findAll(pg.getLowerBound(), pg.getPageSize(), fsortBy, fsortDir);
+            return HttpResponse.ok(items)
                 .header(Constants.X_TOTAL_COUNT, String.valueOf(total))
                 .header(Constants.X_TOTAL_PAGE, String.valueOf(pg.getTotalPages()));
         });

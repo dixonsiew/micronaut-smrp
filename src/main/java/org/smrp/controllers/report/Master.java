@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bson.Document;
 import org.smrp.services.ReportService;
 
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.MutableHttpResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,6 +19,26 @@ public class Master {
 
     public Master(ReportService reportService) {
         this.reportService = reportService;
+    }
+
+    protected MutableHttpResponse<?> send(Map<String, Object> data, String filename) {
+        return HttpResponse.ok(data)
+            .header("Content-Disposition", "attachment; filename=" + filename)
+            .header("Cache-Control", "no-cache, no-store, must-revalidate")
+            .header("Pragma", "no-cache")
+            .header("Expires", "0")
+            .header("filename", filename)
+            .header("Content-Type", MediaType.APPLICATION_JSON);
+    }
+
+    protected MutableHttpResponse<?> send(byte[] data, String filename) {
+        return HttpResponse.ok(data)
+            .header("Content-Disposition", "attachment; filename=" + filename)
+            .header("Cache-Control", "no-cache, no-store, must-revalidate")
+            .header("Pragma", "no-cache")
+            .header("Expires", "0")
+            .header("filename", filename)
+            .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     }
 
     protected Mono<Map<String, String>> getData(Document doc) {
