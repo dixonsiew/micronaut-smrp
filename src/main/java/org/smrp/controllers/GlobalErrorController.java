@@ -9,6 +9,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Error;
 import io.micronaut.http.exceptions.HttpStatusException;
 import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.authentication.AuthorizationException;
 import io.micronaut.security.rules.SecurityRule;
 import jakarta.validation.ConstraintViolationException;
 
@@ -33,6 +34,12 @@ public class GlobalErrorController {
     public HttpResponse<ErrorResponse> handleConstraintViolationException(HttpRequest<?> request, ConstraintViolationException exception) {
         ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.getCode(), exception.getMessage());
         return HttpResponse.badRequest().body(error);
+    }
+
+    @Error(exception = AuthorizationException.class, global = true)
+    public HttpResponse<ErrorResponse> handleAuthorizationException(HttpRequest<?> request, AuthorizationException exception) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.UNAUTHORIZED.getCode(), "Unauthorized");
+        return HttpResponse.unauthorized().body(error);
     }
 
     @Error(exception = HttpStatusException.class, global = true)
