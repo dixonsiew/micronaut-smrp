@@ -1,0 +1,1 @@
+java -jar target/smrp-0.1.jar
