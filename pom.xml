@@ -162,6 +162,18 @@
 
   </dependencies>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>public</directory>
+        <targetPath>scalar</targetPath>
+        <includes>
+          <include>**/*.html</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>io.micronaut.maven</groupId>
