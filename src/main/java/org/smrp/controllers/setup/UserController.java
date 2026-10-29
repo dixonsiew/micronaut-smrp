@@ -64,7 +64,7 @@ public class UserController {
         @QueryValue(value = "_limit", defaultValue = "10") Integer limit,
         @Nullable @QueryValue(value = "sort", defaultValue = "") String sorts
     ) {
-        String sortBy = "code";
+        String sortBy = "username";
         String sortDir = "asc";
 
         if (sorts != null && !sorts.isEmpty()) {
