@@ -1,6 +1,8 @@
 package org.smrp.controllers;
 
 import org.smrp.models.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -17,6 +19,8 @@ import jakarta.validation.ConstraintViolationException;
 @Secured(SecurityRule.IS_ANONYMOUS)
 @Controller
 public class GlobalErrorController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalErrorController.class);
     
     @Error(exception = IllegalArgumentException.class, global = true)
     public HttpResponse<ErrorResponse> handleIllegalArgumentException(HttpRequest<?> request, IllegalArgumentException exception) {
@@ -26,6 +30,7 @@ public class GlobalErrorController {
 
     @Error(exception = RuntimeException.class, global = true)
     public HttpResponse<ErrorResponse> handleRuntimeException(HttpRequest<?> request, RuntimeException exception) {
+        LOG.error("RuntimeException", exception);
         ErrorResponse error = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.getCode(), exception.getMessage());
         return HttpResponse.serverError().body(error);
     }
