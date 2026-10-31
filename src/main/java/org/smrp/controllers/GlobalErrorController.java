@@ -30,7 +30,7 @@ public class GlobalErrorController {
 
     @Error(exception = RuntimeException.class, global = true)
     public HttpResponse<ErrorResponse> handleRuntimeException(HttpRequest<?> request, RuntimeException exception) {
-        LOG.error("RuntimeException", exception);
+        LOG.error("RuntimeException: " + exception.getMessage(), exception);
         ErrorResponse error = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.getCode(), exception.getMessage());
         return HttpResponse.serverError().body(error);
     }
