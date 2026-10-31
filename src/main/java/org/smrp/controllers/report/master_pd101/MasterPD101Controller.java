@@ -83,28 +83,23 @@ public class MasterPD101Controller extends Master {
         return Flux.from(col.find())
             .collectList()
             .flatMap(ls -> {
+                Map<String, Object> data = new LinkedHashMap<>();
+                data.put("filename", filename);
+                data.put("admissionFrom", datefrom);
+                data.put("admissionTo", dateto);
+                data.put("refServiceTypeCode", "02");
+                data.put("facilityCode", facilityCode);
+                
                 if (ls.isEmpty()) {
-                    Map<String, Object> data = new LinkedHashMap<>();
-                    data.put("filename", filename);
-                    data.put("admissionFrom", datefrom);
-                    data.put("admissionTo", dateto);
-                    data.put("refServiceTypeCode", "02");
-                    data.put("facilityCode", facilityCode);
                     data.put("forms", List.of());
                     return Mono.just(send(data, filename));
                 }
 
                 List<Document> lr = Utils.processDoc(ls);
                 Mono<List<Map<String, Object>>> monols = Flux.fromIterable(lr)
-                    .flatMapSequential(doc -> getData(doc).map(md -> getFormsRpt2(doc, md))
-                    ).collectList();
+                    .flatMapSequential(this::getFormsRpt2)
+                    .collectList();
                 return monols.flatMap(forms -> {
-                    Map<String, Object> data = new LinkedHashMap<>();
-                    data.put("filename", filename);
-                    data.put("admissionFrom", datefrom);
-                    data.put("admissionTo", dateto);
-                    data.put("refServiceTypeCode", "02");
-                    data.put("facilityCode", facilityCode);
                     data.put("forms", forms);
                     return Mono.just(send(data, filename));
                 });
@@ -130,28 +125,23 @@ public class MasterPD101Controller extends Master {
         return Flux.from(col.find())
             .collectList()
             .flatMap(ls -> {
+                Map<String, Object> data = new LinkedHashMap<>();
+                data.put("filename", filename);
+                data.put("admissionFrom", datefrom);
+                data.put("admissionTo", dateto);
+                data.put("refServiceTypeCode", "01");
+                data.put("facilityCode", facilityCode);
+
                 if (ls.isEmpty()) {
-                    Map<String, Object> data = new LinkedHashMap<>();
-                    data.put("filename", filename);
-                    data.put("admissionFrom", datefrom);
-                    data.put("admissionTo", dateto);
-                    data.put("refServiceTypeCode", "01");
-                    data.put("facilityCode", facilityCode);
                     data.put("forms", List.of());
                     return Mono.just(send(data, filename));
                 }
 
                 List<Document> lr = Utils.processDoc(ls);
                 Mono<List<Map<String, Object>>> monols = Flux.fromIterable(lr)
-                    .flatMapSequential(doc -> getData(doc).map(md -> getFormsRpt1(doc, md))
-                    ).collectList();
+                    .flatMapSequential(this::getFormsRpt1)
+                    .collectList();
                 return monols.flatMap(forms -> {
-                    Map<String, Object> data = new LinkedHashMap<>();
-                    data.put("filename", filename);
-                    data.put("admissionFrom", datefrom);
-                    data.put("admissionTo", dateto);
-                    data.put("refServiceTypeCode", "01");
-                    data.put("facilityCode", facilityCode);
                     data.put("forms", forms);
                     return Mono.just(send(data, filename));
                 });
@@ -383,135 +373,139 @@ public class MasterPD101Controller extends Master {
             .flatMap(doc -> Mono.just(response));
     }
 
-    private Map<String, Object> getFormsRpt2(Document doc, Map<String, String> md) {
-        Map<String, Object> person = new LinkedHashMap<>();
-        person.put("refPersonTitleCode", md.get("refPersonTitleCode"));
-        person.put("fullName", Utils.getStr(doc.get("PATIENT_NAME")));
-        person.put("refIdentificationTypeCode", md.get("refIdentificationTypeCode"));
-        person.put("identificationNo", Utils.getStr(doc.get("DOCUMENT_NUMBER")));
-        person.put("refAddressTypeCode", "C");
-        person.put("street1", Utils.getStr(doc.get("STREET1")));
-        person.put("street2", Utils.getStr(doc.get("STREET2")));
-        person.put("refCityCode", md.get("refCityCode"));
-        person.put("refPostCode", Utils.getStr(doc.get("POSTCODE")));
-        person.put("refStateCode", md.get("refStateCode"));
-        person.put("refCountryCode", md.get("refCitizenshipCode"));
-        person.put("refContactTypeCode", "02");
-        person.put("contactInfo", Utils.getStr(doc.get("HOME_PHONE")));
+    private Mono<Map<String, Object>> getFormsRpt2(Document doc) {
+        return getData(doc).map(md -> {
+            Map<String, Object> person = new LinkedHashMap<>();
+            person.put("refPersonTitleCode", md.get("refPersonTitleCode"));
+            person.put("fullName", Utils.getStr(doc.get("PATIENT_NAME")));
+            person.put("refIdentificationTypeCode", md.get("refIdentificationTypeCode"));
+            person.put("identificationNo", Utils.getStr(doc.get("DOCUMENT_NUMBER")));
+            person.put("refAddressTypeCode", "C");
+            person.put("street1", Utils.getStr(doc.get("STREET1")));
+            person.put("street2", Utils.getStr(doc.get("STREET2")));
+            person.put("refCityCode", md.get("refCityCode"));
+            person.put("refPostCode", Utils.getStr(doc.get("POSTCODE")));
+            person.put("refStateCode", md.get("refStateCode"));
+            person.put("refCountryCode", md.get("refCitizenshipCode"));
+            person.put("refContactTypeCode", "02");
+            person.put("contactInfo", Utils.getStr(doc.get("HOME_PHONE")));
 
-        Map<String, Object> nok = new LinkedHashMap<>();
-        nok.put("refPersonTitleCode", md.get("refPersonTitleCode"));
-        nok.put("fullName", Utils.getStr(doc.get("PATIENT_NOK_NAME")));
-        nok.put("refIdentificationTypeCode", md.get("refIdentificationTypeCodeNOK"));
-        nok.put("identificationNo", Utils.getStr(doc.get("NOK_ID")));
-        nok.put("refAddressTypeCode", "C");
-        nok.put("street1", Utils.getStr(doc.get("NOK_STREET1")));
-        nok.put("street2", Utils.getStr(doc.get("NOK_STREET2")));
-        nok.put("refCityCode", md.get("refCityCodeNOK"));
-        nok.put("refPostCode", Utils.getStr(doc.get("NOK_POSTCODE")));
-        nok.put("refStateCode", md.get("refStateCodeNOK"));
-        nok.put("refCountryCode", md.get("refCitizenshipCodeNOK"));
-        nok.put("refContactTypeCode", "02");
-        nok.put("contactInfo", Utils.getStr(doc.get("NOK_MOBILE_PHONE")));
+            Map<String, Object> nok = new LinkedHashMap<>();
+            nok.put("refPersonTitleCode", md.get("refPersonTitleCode"));
+            nok.put("fullName", Utils.getStr(doc.get("PATIENT_NOK_NAME")));
+            nok.put("refIdentificationTypeCode", md.get("refIdentificationTypeCodeNOK"));
+            nok.put("identificationNo", Utils.getStr(doc.get("NOK_ID")));
+            nok.put("refAddressTypeCode", "C");
+            nok.put("street1", Utils.getStr(doc.get("NOK_STREET1")));
+            nok.put("street2", Utils.getStr(doc.get("NOK_STREET2")));
+            nok.put("refCityCode", md.get("refCityCodeNOK"));
+            nok.put("refPostCode", Utils.getStr(doc.get("NOK_POSTCODE")));
+            nok.put("refStateCode", md.get("refStateCodeNOK"));
+            nok.put("refCountryCode", md.get("refCitizenshipCodeNOK"));
+            nok.put("refContactTypeCode", "02");
+            nok.put("contactInfo", Utils.getStr(doc.get("NOK_MOBILE_PHONE")));
 
-        Map<String, Object> m = new LinkedHashMap<>();
-        m.put("rn", Utils.getStr(doc.get("ACCOUNT_NO")));
-        m.put("mrn", Utils.getStr(doc.get("PRN")));
-        m.put("eventDate", String.format("%s %s:00",
-                doc.get("REGISTRATION_DATE"),
-                doc.get("REGISTRATION_TIME")));
-        m.put("isPoliceCase", "00");
-        m.put("internalReferral", "false");
-        m.put("refReferralSourceCode", md.get("refReferralSourceCode"));
-        m.put("refGenderCode", md.get("refGenderCode"));
-        m.put("dob", Utils.getStr(doc.get("DOB")));
-        m.put("refMaritalStatusCode", md.get("refMaritalStatusCode"));
-        m.put("refReligionCode", md.get("refReligionCode"));
-        m.put("refCitizenshipCode", md.get("refCitizenshipCode"));
-        m.put("refEthnicCode", md.get("refEthnicCode"));
-        m.put("height", Utils.getNum(Utils.getStr(doc.get("HEIGHT"))));
-        m.put("weight", Utils.getNum(Utils.getStr(doc.get("WEIGHT"))));
-        m.put("refForeignerOriginCountryCode", md.get("refForeignerOriginCountryCode"));
-        m.put("refForeignerResidenceCountryCode", md.get("refForeignerResidenceCountryCode"));
-        m.put("refPersonCategoryCode", md.get("refPersonCategoryCode"));
-        m.put("refRelationshipCode", md.get("refRelationshipCode"));
-        m.put("totalDurationDay", "0");
-        m.put("admissionDate", String.format("%s %s:00",
-                doc.get("ADMISSION_DATE"),
-                doc.get("ADMISSION_TIME")));
-        m.put("person", person);
-        m.put("nextOfKins", nok);
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("rn", Utils.getStr(doc.get("ACCOUNT_NO")));
+            m.put("mrn", Utils.getStr(doc.get("PRN")));
+            m.put("eventDate", String.format("%s %s:00",
+                    doc.get("REGISTRATION_DATE"),
+                    doc.get("REGISTRATION_TIME")));
+            m.put("isPoliceCase", "00");
+            m.put("internalReferral", "false");
+            m.put("refReferralSourceCode", md.get("refReferralSourceCode"));
+            m.put("refGenderCode", md.get("refGenderCode"));
+            m.put("dob", Utils.getStr(doc.get("DOB")));
+            m.put("refMaritalStatusCode", md.get("refMaritalStatusCode"));
+            m.put("refReligionCode", md.get("refReligionCode"));
+            m.put("refCitizenshipCode", md.get("refCitizenshipCode"));
+            m.put("refEthnicCode", md.get("refEthnicCode"));
+            m.put("height", Utils.getNum(Utils.getStr(doc.get("HEIGHT"))));
+            m.put("weight", Utils.getNum(Utils.getStr(doc.get("WEIGHT"))));
+            m.put("refForeignerOriginCountryCode", md.get("refForeignerOriginCountryCode"));
+            m.put("refForeignerResidenceCountryCode", md.get("refForeignerResidenceCountryCode"));
+            m.put("refPersonCategoryCode", md.get("refPersonCategoryCode"));
+            m.put("refRelationshipCode", md.get("refRelationshipCode"));
+            m.put("totalDurationDay", "0");
+            m.put("admissionDate", String.format("%s %s:00",
+                    doc.get("ADMISSION_DATE"),
+                    doc.get("ADMISSION_TIME")));
+            m.put("person", person);
+            m.put("nextOfKins", nok);
 
-        return m;
+            return m;
+        });
     }
 
-    private Map<String, Object> getFormsRpt1(Document doc, Map<String, String> md) {
-        Map<String, Object> person = new LinkedHashMap<>();
-        person.put("refPersonTitleCode", md.get("refPersonTitleCode"));
-        person.put("fullName", Utils.getStr(doc.get("PATIENT_NAME")));
-        person.put("refIdentificationTypeCode", md.get("refIdentificationTypeCode"));
-        person.put("identificationNo", Utils.getStr(doc.get("DOCUMENT_NUMBER")));
-        person.put("refAddressTypeCode", "C");
-        person.put("street1", Utils.getStr(doc.get("STREET1")));
-        person.put("street2", Utils.getStr(doc.get("STREET2")));
-        person.put("refCityCode", md.get("refCityCode"));
-        person.put("refPostCode", Utils.getStr(doc.get("POSTCODE")));
-        person.put("refStateCode", md.get("refStateCode"));
-        person.put("refCountryCode", md.get("refCitizenshipCode"));
-        person.put("refContactTypeCode", "02");
-        person.put("contactInfo", Utils.getStr(doc.get("HOME_PHONE")));
+    private Mono<Map<String, Object>> getFormsRpt1(Document doc) {
+        return getData(doc).map(md -> {
+            Map<String, Object> person = new LinkedHashMap<>();
+            person.put("refPersonTitleCode", md.get("refPersonTitleCode"));
+            person.put("fullName", Utils.getStr(doc.get("PATIENT_NAME")));
+            person.put("refIdentificationTypeCode", md.get("refIdentificationTypeCode"));
+            person.put("identificationNo", Utils.getStr(doc.get("DOCUMENT_NUMBER")));
+            person.put("refAddressTypeCode", "C");
+            person.put("street1", Utils.getStr(doc.get("STREET1")));
+            person.put("street2", Utils.getStr(doc.get("STREET2")));
+            person.put("refCityCode", md.get("refCityCode"));
+            person.put("refPostCode", Utils.getStr(doc.get("POSTCODE")));
+            person.put("refStateCode", md.get("refStateCode"));
+            person.put("refCountryCode", md.get("refCitizenshipCode"));
+            person.put("refContactTypeCode", "02");
+            person.put("contactInfo", Utils.getStr(doc.get("HOME_PHONE")));
 
-        Map<String, Object> nok = new LinkedHashMap<>();
-        nok.put("refPersonTitleCode", md.get("refPersonTitleCodeNOK"));
-        nok.put("fullName", Utils.getStr(doc.get("PATIENT_NOK_NAME")));
-        nok.put("refIdentificationTypeCode", md.get("refIdentificationTypeCodeNOK"));
-        nok.put("identificationNo", Utils.getStr(doc.get("NOK_ID")));
-        nok.put("refAddressTypeCode", "C");
-        nok.put("street1", Utils.getStr(doc.get("NOK_STREET1")));
-        nok.put("street2", Utils.getStr(doc.get("NOK_STREET2")));
-        nok.put("refCityCode", md.get("refCityCodeNOK"));
-        nok.put("refPostCode", Utils.getStr(doc.get("NOK_POSTCODE")));
-        nok.put("refStateCode", md.get("refStateCodeNOK"));
-        nok.put("refCountryCode", md.get("refCitizenshipCodeNOK"));
-        nok.put("refContactTypeCode", "02");
-        nok.put("contactInfo", Utils.getStr(doc.get("NOK_MOBILE_PHONE")));
+            Map<String, Object> nok = new LinkedHashMap<>();
+            nok.put("refPersonTitleCode", md.get("refPersonTitleCodeNOK"));
+            nok.put("fullName", Utils.getStr(doc.get("PATIENT_NOK_NAME")));
+            nok.put("refIdentificationTypeCode", md.get("refIdentificationTypeCodeNOK"));
+            nok.put("identificationNo", Utils.getStr(doc.get("NOK_ID")));
+            nok.put("refAddressTypeCode", "C");
+            nok.put("street1", Utils.getStr(doc.get("NOK_STREET1")));
+            nok.put("street2", Utils.getStr(doc.get("NOK_STREET2")));
+            nok.put("refCityCode", md.get("refCityCodeNOK"));
+            nok.put("refPostCode", Utils.getStr(doc.get("NOK_POSTCODE")));
+            nok.put("refStateCode", md.get("refStateCodeNOK"));
+            nok.put("refCountryCode", md.get("refCitizenshipCodeNOK"));
+            nok.put("refContactTypeCode", "02");
+            nok.put("contactInfo", Utils.getStr(doc.get("NOK_MOBILE_PHONE")));
 
-        Map<String, Object> m = new LinkedHashMap<>();
-        m.put("rn", Utils.getStr(doc.get("ACCOUNT_NO")));
-        m.put("mrn", Utils.getStr(doc.get("PRN")));
-        m.put("eventDate", String.format("%s %s:00",
-                doc.get("REGISTRATION_DATE"),
-                doc.get("REGISTRATION_TIME")));
-        m.put("isPoliceCase", "02");
-        m.put("internalReferral", "false");
-        m.put("refReferralSourceCode", md.get("refReferralSourceCode"));
-        m.put("refGenderCode", md.get("refGenderCode"));
-        m.put("dob", Utils.getStr(doc.get("DOB")));
-        m.put("refMaritalStatusCode", md.get("refMaritalStatusCode"));
-        m.put("refReligionCode", md.get("refReligionCode"));
-        m.put("refCitizenshipCode", md.get("refCitizenshipCode"));
-        m.put("refEthnicCode", md.get("refEthnicCode"));
-        m.put("height", Utils.getNum(Utils.getStr(doc.get("HEIGHT"))));
-        m.put("weight", Utils.getNum(Utils.getStr(doc.get("WEIGHT"))));
-        m.put("refForeignerOriginCountryCode", md.get("refForeignerOriginCountryCode"));
-        m.put("refForeignerResidenceCountryCode", md.get("refForeignerResidenceCountryCode"));
-        m.put("refPersonCategoryCode", md.get("refPersonCategoryCode"));
-        m.put("refRelationshipCode", md.get("refRelationshipCode"));
-        m.put("totalDurationDay", "0");
-        m.put("refWardTransitionTypeCode", "A");
-        m.put("wardDateTime", String.format("%s %s:00",
-                doc.get("ADMISSION_DATE"),
-                doc.get("ADMISSION_TIME")));
-        m.put("wardCode", Utils.getStr(doc.get("WARD_NO")));
-        m.put("refDisciplineCode", md.get("refDisciplineCode"));
-        m.put("refSpecialityCode", md.get("refDisciplineCode"));
-        m.put("refSubSpecialityCode", md.get("refDisciplineCode"));
-        m.put("refWardClassCode", md.get("refWardClassCode"));
-        m.put("refWardCategoryCode", "00");
-        m.put("person", person);
-        m.put("nextOfKins", nok);
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("rn", Utils.getStr(doc.get("ACCOUNT_NO")));
+            m.put("mrn", Utils.getStr(doc.get("PRN")));
+            m.put("eventDate", String.format("%s %s:00",
+                    doc.get("REGISTRATION_DATE"),
+                    doc.get("REGISTRATION_TIME")));
+            m.put("isPoliceCase", "02");
+            m.put("internalReferral", "false");
+            m.put("refReferralSourceCode", md.get("refReferralSourceCode"));
+            m.put("refGenderCode", md.get("refGenderCode"));
+            m.put("dob", Utils.getStr(doc.get("DOB")));
+            m.put("refMaritalStatusCode", md.get("refMaritalStatusCode"));
+            m.put("refReligionCode", md.get("refReligionCode"));
+            m.put("refCitizenshipCode", md.get("refCitizenshipCode"));
+            m.put("refEthnicCode", md.get("refEthnicCode"));
+            m.put("height", Utils.getNum(Utils.getStr(doc.get("HEIGHT"))));
+            m.put("weight", Utils.getNum(Utils.getStr(doc.get("WEIGHT"))));
+            m.put("refForeignerOriginCountryCode", md.get("refForeignerOriginCountryCode"));
+            m.put("refForeignerResidenceCountryCode", md.get("refForeignerResidenceCountryCode"));
+            m.put("refPersonCategoryCode", md.get("refPersonCategoryCode"));
+            m.put("refRelationshipCode", md.get("refRelationshipCode"));
+            m.put("totalDurationDay", "0");
+            m.put("refWardTransitionTypeCode", "A");
+            m.put("wardDateTime", String.format("%s %s:00",
+                    doc.get("ADMISSION_DATE"),
+                    doc.get("ADMISSION_TIME")));
+            m.put("wardCode", Utils.getStr(doc.get("WARD_NO")));
+            m.put("refDisciplineCode", md.get("refDisciplineCode"));
+            m.put("refSpecialityCode", md.get("refDisciplineCode"));
+            m.put("refSubSpecialityCode", md.get("refDisciplineCode"));
+            m.put("refWardClassCode", md.get("refWardClassCode"));
+            m.put("refWardCategoryCode", "00");
+            m.put("person", person);
+            m.put("nextOfKins", nok);
 
-        return m;
+            return m;
+        });
     }
 
     private MongoCollection<Document> getCollection(String username, String vt) {
