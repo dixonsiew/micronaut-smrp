@@ -31,9 +31,15 @@ import jakarta.xml.bind.Unmarshaller;
 public class SoapController {
     
     private final HttpClient httpClient;
+    private final JAXBContext context;
 
     public SoapController(@Client("https://soap-service-free.mock.beeceptor.com") HttpClient httpClient) {
         this.httpClient = httpClient;
+        try {
+            this.context = JAXBContext.newInstance(SoapEnvelope.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize JAXBContext", e);
+        }
     }
 
     // @ApiResponse(content = @Content(
@@ -62,9 +68,7 @@ public class SoapController {
                 Argument.of(String.class)
             ));
         return data.flatMap(x -> {
-            JAXBContext context;
             try {
-                context = JAXBContext.newInstance(SoapEnvelope.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
                 SoapEnvelope envelope = (SoapEnvelope) unmarshaller.unmarshal(new StringReader(x.body()));
                 List<CountryCodeAndName> result = envelope.getBody()
