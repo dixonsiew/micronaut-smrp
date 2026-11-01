@@ -1,12 +1,5 @@
 package org.smrp.jobs;
 
-import io.micronaut.scheduling.annotation.Scheduled;
-import io.micronaut.core.type.Argument;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.client.HttpClient;
-import io.micronaut.http.client.annotation.Client;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -15,6 +8,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.micronaut.core.type.Argument;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.client.HttpClient;
+import io.micronaut.http.client.annotation.Client;
+import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Singleton;
 import reactor.core.publisher.Mono;
 
@@ -29,9 +28,9 @@ public class MainJob {
         this.httpClient = httpClient;
     }
 
-    @Scheduled(fixedDelay = "10s") // 
-    void executeEveryTen() {
-        LOG.info("Simple Job every 10 seconds: {}", new SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(new Date()));
+    @Scheduled(fixedDelay = "60s") // 
+    void executeEverySixtySeconds() {
+        LOG.info("Simple Job every 60 seconds: {}", new SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(new Date()));
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("username", "admin");
         m.put("password", "admin123");

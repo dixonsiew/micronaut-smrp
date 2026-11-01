@@ -96,7 +96,7 @@ public class MaritalStatusController {
 
     @Post("/marital-statuses")
     @Produces(MediaType.APPLICATION_JSON)
-    public Mono<HttpResponse<?>> searchList(
+    public Mono<HttpResponse<Flux<CommonSetup>>> searchList(
         @Valid @Body KeywordDto data,
         @QueryValue(value = "_page", defaultValue = "1") Integer page,
         @QueryValue(value = "_limit", defaultValue = "10") Integer limit,
