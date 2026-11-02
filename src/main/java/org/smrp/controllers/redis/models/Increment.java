@@ -8,13 +8,29 @@ import io.micronaut.serde.annotation.Serdeable;
 @Serdeable
 public class Increment {
     
-    public String key;
-    public long value;
+    private String key;
+    private Long value;
 
-    public Increment(String key, long value) {
-        this.key = key;
-        this.value = value;
+    public Increment(String key, Long value) {
+        setKey(key);
+        setValue(value);
     }
     
     public Increment() {}
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public Long getValue() {
+        return value;
+    }
+
+    public void setValue(Long value) {
+        this.value = value;
+    }
 }

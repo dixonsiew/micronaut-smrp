@@ -39,17 +39,17 @@ public class RedisController {
 
     @Post
     public Mono<Void> create(@Body Increment increment) {
-        return incrementService.set(increment.key, increment.value);
+        return incrementService.set(increment.getKey(), increment.getValue());
     }
 
     @Get("/{key}")
     @Produces(MediaType.APPLICATION_JSON)
     public Mono<Increment> get(String key) {
-        return incrementService.get(key).flatMap(value -> Mono.just(new Increment(key, value)));
+        return incrementService.get(key).map(value -> new Increment(key, value));
     }
 
     @Put("/{key}")
-    public Mono<Void> increment(String key, long value) {
+    public Mono<Void> increment(String key, Long value) {
         return incrementService.increment(key, value);
     }
 
