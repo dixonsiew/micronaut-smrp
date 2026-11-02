@@ -1,4 +1,4 @@
-package org.smrp.controllers.soap;
+package org.smrp.controllers.soap.models;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
