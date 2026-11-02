@@ -177,6 +177,11 @@
       <version>4.0.9</version>
     </dependency>
 
+    <dependency>
+      <groupId>io.micronaut.redis</groupId>
+      <artifactId>micronaut-redis-lettuce</artifactId>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>
