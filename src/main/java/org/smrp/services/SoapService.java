@@ -20,12 +20,12 @@ import reactor.core.publisher.Mono;
 
 
 @Singleton 
-public class SoapClient {
+public class SoapService {
     
     private final HttpClient httpClient;
     private final JAXBContext context;
 
-    public SoapClient(@Client("/") HttpClient httpClient) {
+    public SoapService(@Client("/") HttpClient httpClient) {
         this.httpClient = httpClient;
         try {
             this.context = JAXBContext.newInstance(SoapEnvelope.class);

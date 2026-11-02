@@ -3,7 +3,7 @@ package org.smrp.controllers.soap;
 import java.util.List;
 
 import org.smrp.controllers.soap.models.CountryCodeAndName;
-import org.smrp.services.SoapClient;
+import org.smrp.services.SoapService;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -25,10 +25,10 @@ import reactor.core.publisher.Mono;
 @Controller("/soap")
 public class SoapController {
     
-    private final SoapClient soapClient;
+    private final SoapService soapService;
 
-    public SoapController(SoapClient soapClient) {
-        this.soapClient = soapClient;
+    public SoapController(SoapService soapService) {
+        this.soapService = soapService;
     }
 
     // @ApiResponse(content = @Content(
@@ -37,6 +37,6 @@ public class SoapController {
     @Get("/countries")
     @Produces(MediaType.APPLICATION_JSON)
     public Mono<HttpResponse<List<CountryCodeAndName>>> getCountries() {
-        return soapClient.getCountries();
+        return soapService.getCountries();
     }
 }
