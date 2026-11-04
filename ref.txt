@@ -1,1 +1,7 @@
-http://localhost:8300/smrp/public/rapidoc/index.html
+http://192.168.68.55:8300/smrp/public/rapidoc/index.html
+
+.\mvnw package jib:dockerBuild "-Dimage=smrp:1.0"
+
+kubectl delete deployment smrp
+kubectl apply -f deployment.yaml
+kubectl get pods

@@ -1,7 +1,5 @@
 package org.smrp.controllers.soap.models;
 
-import org.smrp.controllers.soap.ListOfCountryNamesByNameResult;
-
 import io.micronaut.core.annotation.Introspected;
 import jakarta.xml.bind.annotation.*;
 
