@@ -1,13 +1,11 @@
 package org.smrp.controllers.soap.models;
 
-import io.micronaut.core.annotation.Introspected;
 import jakarta.xml.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-@Introspected
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ListOfCountryNamesByNameResult {
 
@@ -15,7 +13,10 @@ public class ListOfCountryNamesByNameResult {
                 namespace = "http://www.oorsprong.org/websamples.countryinfo")
     private List<CountryCodeAndName> countryCodeAndNames = new ArrayList<>();
 
-    public List<CountryCodeAndName> getCountryCodeAndNames() { return countryCodeAndNames; }
+    public List<CountryCodeAndName> getCountryCodeAndNames() {
+        return countryCodeAndNames;
+    }
+
     public void setCountryCodeAndNames(List<CountryCodeAndName> countryCodeAndNames) {
         this.countryCodeAndNames = countryCodeAndNames;
     }

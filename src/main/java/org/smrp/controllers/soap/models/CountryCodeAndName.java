@@ -1,15 +1,8 @@
 package org.smrp.controllers.soap.models;
 
-import io.micronaut.core.annotation.Introspected;
-import io.micronaut.serde.annotation.Serdeable;
-
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.*;
 
 
-@Introspected
-@Serdeable
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CountryCodeAndName {
 
@@ -23,10 +16,21 @@ public class CountryCodeAndName {
                 required = true)
     private String name;
 
-    public String getIsoCode() { return isoCode; }
-    public void setIsoCode(String isoCode) { this.isoCode = isoCode; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getIsoCode() {
+        return isoCode;
+    }
+
+    public void setIsoCode(String isoCode) {
+        this.isoCode = isoCode;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     @Override
     public String toString() {

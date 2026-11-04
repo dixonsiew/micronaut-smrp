@@ -2,6 +2,7 @@ package org.smrp.controllers.soap;
 
 import java.util.List;
 
+import org.smrp.controllers.soap.models.Continent;
 import org.smrp.controllers.soap.models.CountryCodeAndName;
 import org.smrp.services.SoapService;
 
@@ -34,9 +35,21 @@ public class SoapController {
     // @ApiResponse(content = @Content(
     //     array = @ArraySchema(schema = @Schema(implementation = CountryCodeAndName.class))
     // ))
-    @Get("/countries")
+    @Get("/countryCodeAndNames")
     @Produces(MediaType.APPLICATION_JSON)
-    public Mono<HttpResponse<List<CountryCodeAndName>>> getCountries() {
-        return soapService.getCountries();
+    public Mono<HttpResponse<List<CountryCodeAndName>>> getCountryCodeAndNames() {
+        return soapService.getCountryCodeAndNames();
+    }
+
+    @Get("/continents")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Mono<HttpResponse<List<Continent>>> getContinents() {
+        return soapService.getContinents();
+    }
+
+    @Get("/numberToWords/{number}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Mono<HttpResponse<String>> numberToWords(String number) {
+        return soapService.getNumberToWords(number);
     }
 }

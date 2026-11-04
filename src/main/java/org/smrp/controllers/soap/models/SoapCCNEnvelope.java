@@ -1,17 +1,20 @@
 package org.smrp.controllers.soap.models;
 
-import io.micronaut.core.annotation.Introspected;
 import jakarta.xml.bind.annotation.*;
 
 
-@Introspected
 @XmlRootElement(name = "Envelope", namespace = "http://schemas.xmlsoap.org/soap/envelope/")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SoapEnvelope {
+public class SoapCCNEnvelope {
 
     @XmlElement(name = "Body", namespace = "http://schemas.xmlsoap.org/soap/envelope/")
-    private SoapBody body;
+    private SoapCCNBody body;
 
-    public SoapBody getBody() { return body; }
-    public void setBody(SoapBody body) { this.body = body; }
+    public SoapCCNBody getBody() {
+        return body;
+    }
+
+    public void setBody(SoapCCNBody body) {
+        this.body = body;
+    }
 }

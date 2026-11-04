@@ -5,3 +5,11 @@ http://192.168.68.55:8300/smrp/public/rapidoc/index.html
 kubectl delete deployment smrp
 kubectl apply -f deployment.yaml
 kubectl get pods
+
+[minikube]
+docker build -t smrp:latest .
+minikube image ls
+kubectl delete deployment smrp
+kubectl apply -f deployment.yaml
+kubectl get pods
+kubectl get services
