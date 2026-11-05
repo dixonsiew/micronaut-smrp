@@ -13,3 +13,13 @@ kubectl get pods
 kubectl expose deployment postgres-deployment --type=NodePort --port=5432
 
 kubectl describe pod postgres-deployment-6c77b784b8-lwwn9 -n default
+
+minikube image ls
+kubectl delete -f ./deploy.yaml --ignore-not-found
+minikube image rm <postgres-image-name>
+
+kubectl port-forward svc/postgres-service 5432:5432
+
+---
+
+kubectl apply -f deploy.yaml

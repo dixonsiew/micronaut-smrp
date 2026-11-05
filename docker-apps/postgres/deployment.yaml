@@ -1,9 +1,15 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: postgres
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres-deployment
-  labels:
-    app: postgres
 spec:
   replicas: 1
   selector:
@@ -15,8 +21,26 @@ spec:
         app: postgres
     spec:
       containers:
-      - name: postgres-container
-        image: postgres:18 # Use the exact name/tag you loaded
-        imagePullPolicy: Never         # Tells Minikube to look locally
+      - name: postgres
+        image: postgres:18
+        imagePullPolicy: Never # Forces K8s to use the loaded local image
         ports:
-        - containerPort: 5432          # The port your app listens on
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
