@@ -18,8 +18,9 @@ minikube image ls
 kubectl delete -f ./deploy.yaml --ignore-not-found
 minikube image rm <postgres-image-name>
 
-kubectl port-forward svc/postgres-service 5432:5432
-
 ---
 
 kubectl apply -f deploy.yaml
+
+kubectl port-forward svc/postgres-service 5432:5432
+kubectl port-forward deployment/mongodb 27017:27017

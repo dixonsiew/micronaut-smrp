@@ -25,6 +25,8 @@ spec:
       labels:
         app: postgres
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: postgres
           image: postgres:18  # You can change this to your preferred version
@@ -51,9 +53,10 @@ kind: Service
 metadata:
   name: postgres-service
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: postgres
   ports:
     - port: 5432
       targetPort: 5432
+      nodePort: 30001  # You can change this to your preferred NodePort
