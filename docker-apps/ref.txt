@@ -1,0 +1,15 @@
+docker compose up -d
+
+docker compose down
+
+minikube image load postgres:18
+minikube image load mongo:9
+minikube image load redis:8
+minikube image load apache/kafka:4.4.0
+minikube image load provectuslabs/kafka-ui:latest
+
+kubectl apply -f deployment.yaml
+kubectl get pods
+kubectl expose deployment postgres-deployment --type=NodePort --port=5432
+
+kubectl describe pod postgres-deployment-6c77b784b8-lwwn9 -n default
