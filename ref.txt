@@ -1,10 +1,17 @@
 http://192.168.68.55:8300/smrp/public/rapidoc/index.html
 
-.\mvnw package jib:dockerBuild "-Dimage=smrp:1.0"
+.\mvnw package jib:dockerBuild "-Dimage=smrp-micronaut:1.0" "-DskipTests" "-Dpackaging=docker"
+
+docker tag smrp-micronaut:1.0 docker.io/wfsiew888/smrp-micronaut:1.0
+docker push docker.io/wfsiew888/smrp-micronaut:1.0
 
 kubectl delete deployment smrp
 kubectl apply -f deployment.yaml
 kubectl get pods
+
+kubectl scale statefulset smrp-micronaut --replicas=0
+
+kubectl port-forward pod/smrp-micronaut-595d4d8d6-tv5jz 8200:8200
 
 [minikube]
 docker build -t smrp:latest .

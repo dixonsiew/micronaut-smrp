@@ -1,33 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: smrp
+  name: smrp-micronaut
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: smrp
+      app: smrp-micronaut
   template:
     metadata:
       labels:
-        app: smrp
+        app: smrp-micronaut
     spec:
       containers:
-        - name: smrp
-          image: smrp:1.0
+        - name: smrp-micronaut
+          image: docker.io/wfsiew888/smrp-micronaut:1.0
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8300
+            - containerPort: 8200
+              name: http
+              protocol: TCP
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: smrp-service
 spec:
-  type: NodePort
   selector:
-    app: smrp
+    app: smrp-micronaut
   ports:
-    - port: 8300
-      targetPort: 8300
+    - name: http
       nodePort: 30081
+      protocol: TCP
+      port: 8200
+      targetPort: 8200
+  type: NodePort
