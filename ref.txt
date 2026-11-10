@@ -1,11 +1,11 @@
 http://192.168.68.55:8300/smrp/public/rapidoc/index.html
 
-.\mvnw clean package jib:dockerBuild "-Dimage=smrp-micronaut:1.1" "-DskipTests" "-Dpackaging=docker"
+.\mvnw clean package jib:dockerBuild "-Dimage=smrp-micronaut:1.0" "-DskipTests" "-Dpackaging=docker"
 
-docker tag smrp-micronaut:1.1 docker.io/wfsiew888/smrp-micronaut:1.1
-docker push docker.io/wfsiew888/smrp-micronaut:1.1
+docker tag smrp-micronaut:1.0 docker.io/wfsiew888/smrp-micronaut:1.0
+docker push docker.io/wfsiew888/smrp-micronaut:1.0
 
-kubectl delete deployment smrp
+kubectl delete deployment smrp-micronaut
 kubectl apply -f deployment.yaml
 kubectl get pods
 
@@ -13,9 +13,9 @@ kubectl scale statefulset smrp-micronaut --replicas=0
 
 kubectl port-forward pod/smrp-micronaut-595d4d8d6-tv5jz 8200:8200
 
-kubectl port-forward service/smrp-service 8400:http
+kubectl port-forward service/smrp-service 8200:http
 
-kubectl port-forward service/smrp-service 8300:80 --address='0.0.0.0'
+kubectl port-forward service/smrp-service 8200:80 --address='0.0.0.0'
 
 kubectl rollout restart deployment/smrp-micronaut
 

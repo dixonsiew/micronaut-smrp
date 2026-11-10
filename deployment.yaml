@@ -11,8 +11,8 @@ spec:
     - name: http
       port: 80
       protocol: TCP
-      targetPort: 8300
-      nodePort: 30083
+      targetPort: 8200
+      nodePort: 30081
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -30,9 +30,9 @@ spec:
     spec:
       containers:
         - name: smrp-micronaut
-          image: docker.io/wfsiew888/smrp-micronaut:1.1
+          image: docker.io/wfsiew888/smrp-micronaut:1.0
           imagePullPolicy: Always
           ports:
-            - containerPort: 8300
+            - containerPort: 8200
               name: http
               protocol: TCP

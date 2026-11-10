@@ -24,7 +24,7 @@ public class MainJob {
     private static final Logger LOG = LoggerFactory.getLogger(MainJob.class);
     private final HttpClient httpClient;
 
-    public MainJob(@Client("http://localhost:8300/smrp") HttpClient httpClient) {
+    public MainJob(@Client("http://localhost:8200/smrp") HttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
