@@ -9,7 +9,7 @@ kubectl delete deployment smrp-micronaut
 kubectl apply -f deployment.yaml
 kubectl get pods
 
-kubectl scale statefulset smrp-micronaut --replicas=0
+kubectl scale deployment smrp-micronaut --replicas=0
 
 kubectl port-forward pod/smrp-micronaut-595d4d8d6-tv5jz 8200:8200
 
