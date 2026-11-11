@@ -28,7 +28,7 @@ public class QuoteController {
         this.quoteService = quoteService;
     }
     
-    @Get("/quotes")
+    @Get("/quotes/stream")
     @Produces(MediaType.TEXT_EVENT_STREAM)
     public Flux<Quote> quotes() {
         return quoteService.getQuoteStream();

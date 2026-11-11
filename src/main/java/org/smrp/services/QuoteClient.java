@@ -10,6 +10,6 @@ import io.micronaut.configuration.kafka.annotation.Topic;
 @KafkaClient()
 public interface QuoteClient {
 
-    @Topic("quote-requests")
+    @Topic("quote-requests-micronaut")
     void process(@KafkaKey String requestid, Quote quote);
 }

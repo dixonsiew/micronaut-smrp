@@ -22,7 +22,7 @@ public class QuoteLisener {
         this.quoteService = quoteService;
     }
 
-    @Topic("quote-requests")
+    @Topic("quote-requests-micronaut")
     public void receiveQuote(@KafkaKey String uuid, @MessageBody Quote quote) {
         LOG.info("Got Quote - {} with UUID: {}", uuid, quote);
         quoteService.emitQuote(quote);
