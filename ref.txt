@@ -1,4 +1,4 @@
-http://192.168.68.55:8300/smrp/public/rapidoc/index.html
+http://192.168.68.55:8200/smrp/public/rapidoc/index.html
 
 .\mvnw clean package jib:dockerBuild "-Dimage=smrp-micronaut:1.0" "-DskipTests" "-Dpackaging=docker"
 

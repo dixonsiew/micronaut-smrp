@@ -4,9 +4,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smrp.controllers.kafka.models.Quote;
+import org.smrp.services.QuoteClient;
 
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
@@ -23,12 +27,25 @@ public class MainJob {
     
     private static final Logger LOG = LoggerFactory.getLogger(MainJob.class);
     private final HttpClient httpClient;
+    private final QuoteClient quoteClient;
+    private final Random random = new Random();
 
-    public MainJob(@Client("http://localhost:8200/smrp") HttpClient httpClient) {
+    public MainJob(@Client("http://localhost:8200/smrp") HttpClient httpClient, QuoteClient quoteClient) {
         this.httpClient = httpClient;
+        this.quoteClient = quoteClient;
     }
 
-    @Scheduled(fixedDelay = "60s") // 
+    @Scheduled(fixedDelay = "10s")
+    void executeEveryTenSeconds() throws InterruptedException {
+        Thread.sleep(200);
+        UUID uuid = UUID.randomUUID();
+        LOG.info("Sending quote request with UUID: {}", uuid);
+        Quote o = new Quote(uuid.toString(), random.nextInt(100));
+        quoteClient.process(uuid.toString(), o);
+    }
+
+
+    @Scheduled(fixedDelay = "60s")
     void executeEverySixtySeconds() {
         LOG.info("Simple Job every 60 seconds: {}", new SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(new Date()));
         Map<String, Object> m = new LinkedHashMap<>();

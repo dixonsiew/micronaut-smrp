@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.smrp</groupId>
   <artifactId>smrp</artifactId>
-  <version>1.1</version>
+  <version>1.0</version>
   <packaging>${packaging}</packaging>
 
   <parent>
@@ -180,6 +180,11 @@
     <dependency>
       <groupId>io.micronaut.redis</groupId>
       <artifactId>micronaut-redis-lettuce</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.micronaut.kafka</groupId>
+      <artifactId>micronaut-kafka</artifactId>
     </dependency>
 
   </dependencies>
