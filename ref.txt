@@ -1,9 +1,9 @@
 http://192.168.68.55:8200/smrp/public/rapidoc/index.html
 
-.\mvnw clean package jib:dockerBuild "-Dimage=smrp-micronaut:1.4" "-DskipTests" "-Dpackaging=docker"
+.\mvnw clean package jib:dockerBuild "-Dimage=smrp-micronaut:1.7" "-DskipTests" "-Dpackaging=docker"
 
-docker tag smrp-micronaut:1.4 docker.io/wfsiew888/smrp-micronaut:1.4
-docker push docker.io/wfsiew888/smrp-micronaut:1.4
+docker tag smrp-micronaut:1.7 docker.io/wfsiew888/smrp-micronaut:1.7
+docker push docker.io/wfsiew888/smrp-micronaut:1.7
 
 kubectl delete deployment smrp-micronaut
 kubectl apply -f deployment.yaml
