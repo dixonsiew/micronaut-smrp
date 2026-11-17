@@ -35,9 +35,9 @@ public class QuoteController {
     @Produces(MediaType.TEXT_EVENT_STREAM)
     public Flux<Event<Quote>> quotes() {
         Flux<Event<Quote>> kafkaFlux = quoteListener.getQuoteStream()
-            .map(data -> Event.of(data).name("kafka-quote"));
+            .map(Event::of);
         Flux<Event<Quote>> heartbeat = Flux.interval(Duration.ofSeconds(15))
-            .map(tick -> Event.of(new Quote()).comment("keep-alive"));
+            .map(tick -> Event.of((Quote) null).comment("keep-alive"));
         return Flux.merge(kafkaFlux, heartbeat);
     }
 }
