@@ -3,7 +3,7 @@
 kubectl delete service smrp-mn
 kubectl delete deployment smrp-mn
 
-mvnw clean package jib:dockerBuild "-Dimage=smrp-mn:1.0.0" "-DskipTests" "-Dpackaging=docker"
+mvnw clean package jib:dockerBuild "-Dimage=smrp-mn:1.0.0" "-Dpackaging=docker"
 
 kubectl apply -f minikube.yaml
 
