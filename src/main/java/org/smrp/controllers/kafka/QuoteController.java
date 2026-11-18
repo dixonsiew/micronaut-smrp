@@ -1,9 +1,7 @@
 package org.smrp.controllers.kafka;
 
-import java.time.Duration;
-
 import org.smrp.controllers.kafka.models.Quote;
-import org.smrp.services.QuoteListener;
+import org.smrp.services.QuoteService;
 
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
@@ -25,19 +23,17 @@ import reactor.core.publisher.Flux;
 @Controller("/kafka")
 public class QuoteController {
     
-    private final QuoteListener quoteListener;
+    private final QuoteService quoteService;
 
-    public QuoteController(QuoteListener quoteListener) {
-        this.quoteListener = quoteListener;
+    public QuoteController(QuoteService quoteService) {
+        this.quoteService = quoteService;
     }
     
     @Get("/quotes/stream")
     @Produces(MediaType.TEXT_EVENT_STREAM)
     public Flux<Event<Quote>> quotes() {
-        Flux<Event<Quote>> kafkaFlux = quoteListener.getQuoteStream()
+        Flux<Event<Quote>> kafkaFlux = quoteService.getQuoteStream()
             .map(Event::of);
-        Flux<Event<Quote>> heartbeat = Flux.interval(Duration.ofSeconds(15))
-            .map(tick -> Event.of((Quote) null).comment("keep-alive"));
-        return Flux.merge(kafkaFlux, heartbeat);
+        return kafkaFlux;
     }
 }
